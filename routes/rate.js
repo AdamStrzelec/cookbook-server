@@ -7,18 +7,27 @@ const Rate = require('../models/rate');
 const Recipe = require('../models/recipe');
 
 router.post('/', checkAuth, (req, res, next)=>{
-
+    
     Rate.find({recipeId: req.body.recipeId, reviewerId: req.userData.userId})
     .exec()
     .then(result => {
-        console.log(result.length)
+        console.log('length: '+result.length + ' ' + req.userData.userId)
         if(result.length>0){
             return res.status(403).json({message: 'Nie możesz dodać oceny dla tego przepisu ponownie'})
         }else{
-            Recipe.find({ ownerId: req.userData.userId }).exec()
+            Recipe.find({ 
+                _id: req.body.recipeId,
+                ownerId: req.userData.userId
+             }).exec()
             .then(result => {
+                console.log('length 2: '+result.length + ' ' + req.userData.userId);
+                console.log(result)
                 if(result.length>0){
-                    return res.status(403).json({message: 'Nie możesz dodać ceny dla swojego przepisu'})
+                    
+                    // console.log('compare')
+                    // console.log(ownerId);
+                    // console.log(req.userData.userId);
+                    return res.status(403).json({message: 'Nie możesz dodać oceny dla swojego przepisu'})
                 }else{
                         const rate = new Rate({
                             _id: new mongoose.Types.ObjectId(),
