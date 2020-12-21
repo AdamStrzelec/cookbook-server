@@ -20,6 +20,11 @@ app.use(bodyParser.json());
 
 app.use(cors());
 
+app.use('/', (req, res, next) => {
+    return res.status(200).json({
+        message: 'hello'
+    })
+})
 app.use('/uploads', express.static('uploads'))
 app.use('/user', userRoutes);
 app.use('/recipe', recipeRoutes);
