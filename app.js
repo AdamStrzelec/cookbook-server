@@ -11,7 +11,7 @@ const rateRoutes = require('./routes/rate');
 
 require('dotenv').config()
 
-const uri = process.env.DB_URI;
+const uri = 'mongodb://Adam_96:Adam!2#4@node-rest-shop-shard-00-00-klt2b.mongodb.net:27017,node-rest-shop-shard-00-01-klt2b.mongodb.net:27017,node-rest-shop-shard-00-02-klt2b.mongodb.net:27017/test?ssl=true&replicaSet=node-rest-shop-shard-0&authSource=admin&retryWrites=true';
 mongoose.connect(uri, {useUnifiedTopology: true, useNewUrlParser: true, useCreateIndex: true });
 
 app.use(morgan('dev'));
