@@ -55,22 +55,20 @@ validateRecipe = (req) => {
     }
 }
 
-router.post('/', checkAuth, upload.single('recipeImg'), (req, res)=>{
-    const url = req.protocol + '://' + req.get('host');
-    const imagePath = url + '/uploads/' + req.file.filename
-    const body = JSON.parse(JSON.parse(JSON.stringify(req.body.recipe)))
+router.post('/', checkAuth, (req, res)=>{
+    console.log(req.body.recipe)
 
     const recipe = new Recipe({
         _id: new mongoose.Types.ObjectId(),
         ownerId: req.userData.userId,
         ownerNick: req.userData.nick,
-        name: body.name,
-        type: body.type,
-        description: body.description,
-        ingredients: body.ingredients,
-        preparationDescription: body.preparationDescription,
+        name: req.body.recipe.name,
+        type: req.body.recipe.type,
+        description: req.body.recipe.description,
+        ingredients: req.body.recipe.ingredients,
+        preparationDescription: req.body.recipe.preparationDescription,
         averageRate: 0,
-        imagePath: imagePath
+        imagePath: req.body.recipe.imagePath
     })  
     recipe.save()
     .then((recipe)=>{
@@ -88,42 +86,42 @@ router.post('/', checkAuth, upload.single('recipeImg'), (req, res)=>{
 })
 
 
-router.delete('/', checkAuth, (req, res, next)=>{
-    let fileName;
-    Recipe.findOne({ _id: req.body.recipeId })
-    .exec()
-    .then(recipe => {
-        const indexOf = recipe.imagePath.indexOf('/uploads');
-        fileName = '.'+recipe.imagePath.substring(indexOf);
-        // if(recipe.ownerId==req.userData.userId){ <- owner id
-            if(req.userData.userId=='5fdf734542777b1dcc3862a3'){ // <- admin id
-            Recipe.deleteOne({_id: req.body.recipeId})
-            .then(()=>{
-                fs.unlink(fileName, (err) => {
-                    if (err) {
-                        console.log(err)
-                        throw err
-                    };
-                });
-                Rate.deleteMany({recipeId: req.body.recipeId})
-                .then(()=>{
-                    res.status(200).json({message: 'recipe deleted'});
-                })
-                .catch((err) => {
-                    res.status(500).json({error: err});
-                })
-            })
-            .catch(err => res.status(500).json({error: err}))
-        }else{
-            res.status(403).json({message: 'no access'})
-        }
-    })
-    .catch(err => {
-        res.status(500).json({
-            error: err
-        })
-    })
-})
+// router.delete('/', checkAuth, (req, res, next)=>{
+//     let fileName;
+//     Recipe.findOne({ _id: req.body.recipeId })
+//     .exec()
+//     .then(recipe => {
+//         const indexOf = recipe.imagePath.indexOf('/uploads');
+//         fileName = '.'+recipe.imagePath.substring(indexOf);
+//         // if(recipe.ownerId==req.userData.userId){ <- owner id
+//             if(req.userData.userId=='5fdf734542777b1dcc3862a3'){ // <- admin id
+//             Recipe.deleteOne({_id: req.body.recipeId})
+//             .then(()=>{
+//                 fs.unlink(fileName, (err) => {
+//                     if (err) {
+//                         console.log(err)
+//                         throw err
+//                     };
+//                 });
+//                 Rate.deleteMany({recipeId: req.body.recipeId})
+//                 .then(()=>{
+//                     res.status(200).json({message: 'recipe deleted'});
+//                 })
+//                 .catch((err) => {
+//                     res.status(500).json({error: err});
+//                 })
+//             })
+//             .catch(err => res.status(500).json({error: err}))
+//         }else{
+//             res.status(403).json({message: 'no access'})
+//         }
+//     })
+//     .catch(err => {
+//         res.status(500).json({
+//             error: err
+//         })
+//     })
+// })
 
 router.get('/id/:recipeId', (req, res, next) => {
     Recipe.findOne({ _id: req.params.recipeId })
